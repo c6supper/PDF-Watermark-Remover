@@ -1,5 +1,12 @@
 from pypdf import PdfReader, PdfWriter
 
+def show_tree(outlines, indent=0):
+    for item in outlines:
+        if isinstance(item, list):
+            show_tree(item, indent+4)
+        else:           
+            print(f'{" "*indent}{item.title}')
+
 def removeWatermark(input_fname: str, output_fname: str):
 
     with open(input_fname, "rb") as input_file:
@@ -7,15 +14,13 @@ def removeWatermark(input_fname: str, output_fname: str):
         reader = PdfReader(input_file)
         writer = PdfWriter()
 
-        for n in range(len(reader.pages)):
-
-            page = reader.pages[n]
+        writer.clone_document_from_reader(reader)
+        
+        for page in writer.pages:
             del page["/Contents"][-1]
-
-            writer.add_page(page)
+        
 
     with open(output_fname, "wb") as output_file:
-
         writer.write(output_file)
 
 if __name__ == "__main__":
